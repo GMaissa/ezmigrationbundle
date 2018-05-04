@@ -4,9 +4,22 @@ namespace Kaliop\eZMigrationBundle\Core\FieldHandler;
 
 use eZ\Publish\Core\FieldType\BinaryFile\Value as BinaryFileValue;
 use Kaliop\eZMigrationBundle\API\FieldValueConverterInterface;
+use eZ\Publish\Core\IO\UrlDecorator;
 
 class EzBinaryFile extends FileFieldHandler implements FieldValueConverterInterface
 {
+    /**
+     * @var string
+     */
+    protected $binaryDir;
+
+    public function __construct($ioRootDir, UrlDecorator $ioDecorator=null, $binaryDir)
+    {
+        parent::__construct($ioRootDir, $ioDecorator);
+
+        $this->binaryDir = $binaryDir;
+    }
+
     /**
      * @param array|string $fieldValue The path to the file or an array with 'path' key
      * @param array $context The context for execution of the current migrations. Contains f.e. the path to the migration
@@ -59,7 +72,7 @@ class EzBinaryFile extends FileFieldHandler implements FieldValueConverterInterf
     public function fieldValueToHash($fieldValue, array $context = array())
     {
         return array(
-            'path' => realpath($this->ioRootDir) . '/' . ($this->ioDecorator ? $this->ioDecorator->undecorate($fieldValue->uri) : $fieldValue->uri),
+            'path' => realpath($this->ioRootDir) . '/' . $this->binaryDir . '/' . $fieldValue->id,
             'filename'=> $fieldValue->fileName,
             'mimeType' => $fieldValue->mimeType
         );

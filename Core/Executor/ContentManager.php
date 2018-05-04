@@ -9,6 +9,7 @@ use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\ContentCreateStruct;
 use eZ\Publish\API\Repository\Values\Content\ContentUpdateStruct;
 use eZ\Publish\Core\Base\Exceptions\NotFoundException;
+use eZ\Publish\API\Repository\FieldTypeService;
 use Kaliop\eZMigrationBundle\API\Collection\ContentCollection;
 use Kaliop\eZMigrationBundle\API\MigrationGeneratorInterface;
 use Kaliop\eZMigrationBundle\Core\FieldHandlerManager;
@@ -39,6 +40,11 @@ class ContentManager extends RepositoryExecutor implements MigrationGeneratorInt
     protected $locationManager;
     protected $sortConverter;
 
+    /**
+     * @var FieldTypeService
+     */
+    protected $fieldTypeService;
+
     public function __construct(
         ContentMatcher $contentMatcher,
         SectionMatcher $sectionMatcher,
@@ -47,7 +53,8 @@ class ContentManager extends RepositoryExecutor implements MigrationGeneratorInt
         ObjectStateGroupMatcher $objectStateGroupMatcher,
         FieldHandlerManager $fieldHandlerManager,
         LocationManager $locationManager,
-        SortConverter $sortConverter
+        SortConverter $sortConverter,
+        FieldTypeService $fieldTypeService
     ) {
         $this->contentMatcher = $contentMatcher;
         $this->sectionMatcher = $sectionMatcher;
@@ -57,6 +64,7 @@ class ContentManager extends RepositoryExecutor implements MigrationGeneratorInt
         $this->fieldHandlerManager = $fieldHandlerManager;
         $this->locationManager = $locationManager;
         $this->sortConverter = $sortConverter;
+        $this->fieldTypeService = $fieldTypeService;
     }
 
     /**
@@ -570,9 +578,14 @@ class ContentManager extends RepositoryExecutor implements MigrationGeneratorInt
                 $attributes = array();
                 foreach ($content->getFieldsByLanguage($this->getLanguageCodeFromContext($context)) as $fieldIdentifier => $field) {
                     $fieldDefinition = $contentType->getFieldDefinition($fieldIdentifier);
-                    $attributes[$field->fieldDefIdentifier] = $this->fieldHandlerManager->fieldValueToHash(
-                        $fieldDefinition->fieldTypeIdentifier, $contentType->identifier, $field->value
-                    );
+                    $isFieldEmpty = $this->fieldTypeService
+                        ->getFieldType($fieldDefinition->fieldTypeIdentifier)
+                        ->isEmptyValue($field->value);
+                    if (!$isFieldEmpty) {
+                        $attributes[$field->fieldDefIdentifier] = $this->fieldHandlerManager->fieldValueToHash(
+                            $fieldDefinition->fieldTypeIdentifier, $contentType->identifier, $field->value
+                        );
+                    }
                 }
 
                 $contentData = array_merge(

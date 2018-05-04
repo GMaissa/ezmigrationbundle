@@ -328,6 +328,7 @@ services:
             - '@ez_migration_bundle.complex_field_manager'
             - '@ez_migration_bundle.executor.location_manager'
             - '@ez_migration_bundle.helper.sort_converter'
+            - '@ezpublish.api.service.field_type'
         tags:
             - { name: ez_migration_bundle.executor }
 
@@ -547,7 +548,8 @@ services:
         class: '%ez_migration_bundle.complex_field.ezbinaryfile.class%'
         arguments:
             - "$io.root_dir$"
-            - "@?ezpublish.core.io.prefix_url_decorator"
+            - ~
+            - "$binary_dir$"
         tags:
             - { name: ez_migration_bundle.complex_field, fieldtype: ezbinaryfile, priority: 0 }
 
