@@ -2,7 +2,7 @@
 
 namespace Kaliop\eZMigrationBundle\Core\FieldHandler;
 
-use eZ\Publish\Core\FieldType\Relation\Value;
+use eZ\Publish\Core\FieldType\ImageAsset\Value;
 use Kaliop\eZMigrationBundle\API\FieldValueImporterInterface;
 use Kaliop\eZMigrationBundle\API\FieldDefinitionConverterInterface;
 use Kaliop\eZMigrationBundle\Core\Matcher\ContentMatcher;
@@ -25,6 +25,14 @@ class EzImageAsset extends AbstractFieldHandler implements FieldValueImporterInt
      */
     public function hashToFieldValue($fieldValue, array $context = array())
     {
+        $altText = '';
+
+        if ($fieldValue === null) {
+            return new Value();
+        } else if (isset($fieldValue['alt_text'])) {
+            $altText = $fieldValue['alt_text'];
+        }
+
         if (is_array($fieldValue) && array_key_exists('destinationContentId', $fieldValue)) {
             // fromHash format
             $id = $fieldValue['destinationContentId'];
@@ -42,20 +50,9 @@ class EzImageAsset extends AbstractFieldHandler implements FieldValueImporterInt
         // 2. resolve remote ids
         $id = $this->contentMatcher->matchOneByKey($id)->id;
 
-        return new Value($id);
-    }
-
-    public function fieldSettingsToHash($settingsValue, array $context = array())
-    {
-        // work around https://jira.ez.no/browse/EZP-26916
-        if (is_array($settingsValue) && isset($settingsValue['selectionRoot']) && $settingsValue['selectionRoot'] === '') {
-            $settingsValue['selectionRoot'] = null;
-        }
-        return $settingsValue;
-    }
-
-    public function hashToFieldSettings($settingsHash, array $context = array())
-    {
-        return $settingsHash;
+        return new Value(array(
+            'destinationContentId' => $id,
+            'alternativeText' => $altText,
+        ));
     }
 }
