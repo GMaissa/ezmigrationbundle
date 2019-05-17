@@ -7,7 +7,7 @@ use Kaliop\eZMigrationBundle\API\FieldValueImporterInterface;
 use Kaliop\eZMigrationBundle\API\FieldDefinitionConverterInterface;
 use Kaliop\eZMigrationBundle\Core\Matcher\ContentMatcher;
 
-class EzImageAsset extends AbstractFieldHandler
+class EzImageAsset extends AbstractFieldHandler implements FieldValueImporterInterface
 {
     protected $contentMatcher;
 

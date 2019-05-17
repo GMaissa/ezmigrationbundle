@@ -668,7 +668,7 @@ services:
         arguments:
             - '@ez_migration_bundle.content_matcher'
         tags:
-            - { name: ez_migration_bundle.complex_field, fieldtype: ezobjectrelation, priority: 0 }
+            - { name: ez_migration_bundle.complex_field, fieldtype: ezimageasset, priority: 0 }
 
     ez_migration_bundle.complex_field.ezrelationlist:
         parent: ez_migration_bundle.complex_field
