@@ -51,9 +51,6 @@ class EzImageAsset extends AbstractFieldHandler implements FieldValueImporterInt
         // 2. resolve remote ids
         $id = $this->contentMatcher->matchOneByKey($id)->id;
 
-        return new Value(array(
-            'destinationContentId' => $id,
-            'alternativeText' => $altText,
-        ));
+        return new Value($id, $altText);
     }
 }
