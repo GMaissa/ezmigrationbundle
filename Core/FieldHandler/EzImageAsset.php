@@ -17,7 +17,7 @@ class EzImageAsset extends AbstractFieldHandler implements FieldValueImporterInt
     }
 
     /**
-     * Creates a value object to use as the field value when setting an ez relation field type.
+     * Creates a value object to use as the field value when setting an ez image asset field type.
      *
      * @param array|string|int $fieldValue The definition of the field value, structured in the yml file
      * @param array $context The context for execution of the current migrations. Contains f.e. the path to the migration
@@ -29,7 +29,8 @@ class EzImageAsset extends AbstractFieldHandler implements FieldValueImporterInt
 
         if ($fieldValue === null) {
             return new Value();
-        } else if (isset($fieldValue['alt_text'])) {
+        }
+        if (isset($fieldValue['alt_text'])) {
             $altText = $fieldValue['alt_text'];
         }
 
